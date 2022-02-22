@@ -59,7 +59,7 @@ export class ServerlessKanbanReactStack extends Stack {
     });
 
     new s3deploy.BucketDeployment(this, 'DeployWithInvalidation', {
-      sources: [s3deploy.Source.asset('./app')],
+      sources: [s3deploy.Source.asset('./app/build')],
       destinationBucket: bucket,
       distribution,
       distributionPaths: ['/*'],
