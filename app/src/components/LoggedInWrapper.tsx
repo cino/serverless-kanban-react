@@ -12,17 +12,13 @@ const user = {
     imageUrl:
         'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
 }
+
 const navigation = [
     { name: 'Dashboard', href: '#', current: true },
     { name: 'Team', href: '#', current: false },
     { name: 'Projects', href: '#', current: false },
     { name: 'Calendar', href: '#', current: false },
     { name: 'Reports', href: '#', current: false },
-]
-const userNavigation = [
-    { name: 'Your Profile', href: '#' },
-    { name: 'Settings', href: '#' },
-    { name: 'Sign out', href: '#' },
 ]
 
 function classNames(...classes: string[]) {
@@ -36,9 +32,11 @@ export const LoggedInWrapper = (props: any) => {
     const handleLogOut = (event: any) => {
         event.preventDefault();
 
-        dispatch(signOutAsync());
-
-        navigate('/login');
+        (async () => {
+            await dispatch(signOutAsync());
+        })().then(() => {
+            navigate('/auth/login');
+        });
     }
 
     return (
@@ -105,7 +103,20 @@ export const LoggedInWrapper = (props: any) => {
                                                     leaveTo="transform opacity-0 scale-95"
                                                 >
                                                     <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                                        <Menu.Item key="singOut">
+                                                        <Menu.Item key="profile">
+                                                            {({ active }) => (
+                                                                <a
+                                                                    href="/profile"
+                                                                    className={classNames(
+                                                                        active ? 'bg-gray-100' : '',
+                                                                        'block px-4 py-2 text-sm text-gray-700'
+                                                                    )}
+                                                                >
+                                                                    Your Profile
+                                                                </a>
+                                                            )}
+                                                        </Menu.Item>
+                                                        <Menu.Item key="signOut">
                                                             {({ active }) => (
                                                                 <a
                                                                     href="/signout"
@@ -173,16 +184,23 @@ export const LoggedInWrapper = (props: any) => {
                                         </button>
                                     </div>
                                     <div className="mt-3 px-2 space-y-1">
-                                        {userNavigation.map((item) => (
-                                            <Disclosure.Button
-                                                key={item.name}
-                                                as="a"
-                                                href={item.href}
-                                                className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
-                                            >
-                                                {item.name}
-                                            </Disclosure.Button>
-                                        ))}
+                                        <Disclosure.Button
+                                            key="profile"
+                                            as="a"
+                                            href="/profile"
+                                            className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
+                                        >
+                                            Profile
+                                        </Disclosure.Button>
+                                        <Disclosure.Button
+                                            key="signout"
+                                            as="a"
+                                            href="/auth/signout"
+                                            onClick={handleLogOut}
+                                            className="block px-3 py-2 rounded-md text-base font-medium text-gray-400 hover:text-white hover:bg-gray-700"
+                                        >
+                                            Sign out
+                                        </Disclosure.Button>
                                     </div>
                                 </div>
                             </Disclosure.Panel>

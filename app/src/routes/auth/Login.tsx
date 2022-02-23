@@ -17,12 +17,15 @@ export const Login = () => {
     // Todo; this should be a lot better
     try {
       await signInWithEmail(username, password);
-      console.log('signed in');
+
       (async () => {
         await dispatch(setCredentialsAsync());
-      })().then(() => { navigate('/') });
+      })().then(() => {
+        navigate('/dashboard');
+      });
 
     } catch (err: any) {
+      console.log(err);
       if (err.code === 'UserNotConfirmedException') {
         navigate('/verify');
       } else if (err.code === 'NewPasswordRequired') {
