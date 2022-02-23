@@ -1,39 +1,54 @@
 import React from 'react';
-import { Link } from "react-router-dom";
-import './App.css';
+import { selectAuth, setCredentialsAsync } from './app/authSlice';
+import { useAppDispatch, useAppSelector } from './app/hooks';
+import { currentUser } from './app/auth';
+import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { Dashboard } from './routes/Dashboard';
+import { Login } from './routes/auth/Login';
 
-function Home() {
+
+export type ProtectedRouteProps = {
+  isAuthenticated: boolean;
+  authenticationPath: string;
+  outlet: JSX.Element;
+};
+
+export function ProtectedRoute({ isAuthenticated, authenticationPath, outlet }: ProtectedRouteProps) {
+  if (isAuthenticated) {
+    return outlet;
+  } else {
+    return <Navigate to={{ pathname: authenticationPath }} replace />;
+  }
+};
+
+function App() {
+  const dispatch = useAppDispatch();
+  const auth = useAppSelector(selectAuth);
+
+  console.log(auth);
+
+  React.useEffect(() => {
+    (async () => {
+      // check user and set state
+      dispatch(setCredentialsAsync());
+
+      // auto logout
+    })();
+  }, []);
+
   return (
-    <>
-      <main>
-        <h2>Welcome to the homepage!</h2>
-        <p>You can do this, I believe in you.</p>
-      </main>
-      <nav>
-        <Link to="/about">About</Link>
-      </nav>
-    </>
+    <div className="App">
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<ProtectedRoute isAuthenticated={currentUser} authenticationPath='/login' outlet={<Dashboard />} />} />
+
+          <Route path="/login" element={<Login />} />
+          {/* <Route path="/new-password" element={<NewPassword />} /> */}
+
+        </Routes>
+      </BrowserRouter>
+    </div>
   );
 }
 
-function About() {
-  return (
-    <>
-      <main>
-        <h2>Who are we?</h2>
-        <p>
-          That feels like an existential question, don't you
-          think?
-        </p>
-      </main>
-      <nav>
-        <Link to="/">Home</Link>
-      </nav>
-    </>
-  );
-}
-
-export {
-  Home,
-  About
-}
+export default App;
