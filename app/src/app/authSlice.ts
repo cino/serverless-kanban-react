@@ -15,11 +15,6 @@ const initialState: UserState = {
     signedIn: false,
 };
 
-// The function below is called a thunk and allows us to perform async logic. It
-// can be dispatched like a regular action: `dispatch(incrementAsync(10))`. This
-// will call the thunk with the `dispatch` function as the first argument. Async
-// code can then be executed and other actions can be dispatched. Thunks are
-// typically used to make async requests.
 export const setCredentialsAsync = createAsyncThunk(
     'user/setCredentials',
     async () => {
@@ -51,7 +46,7 @@ export const signOutAsync = createAsyncThunk(
     }
 );
 
-export const counterSlice = createSlice({
+export const authSlice = createSlice({
     name: 'user',
     initialState,
     // The `reducers` field lets us define reducers and generate associated actions
@@ -77,6 +72,6 @@ export const counterSlice = createSlice({
 
 export const selectAuth = (state: RootState) => state.auth;
 
-// export const { increment, decrement, incrementByAmount } = counterSlice.actions;
+// export const { increment, decrement, incrementByAmount } = authSlice.actions;
 
-export default counterSlice.reducer;
+export default authSlice.reducer;
