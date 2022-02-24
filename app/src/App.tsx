@@ -16,14 +16,11 @@ export const App = () => {
   const user = useSelector(selectAuth);
 
   React.useEffect(() => {
-    (async () => {
-      // check user and set state
-      dispatch(setCredentialsAsync());
+    const checkUserAuth = async () => dispatch(setCredentialsAsync());
+    checkUserAuth();
 
-      console.log('okeey');
-      // auto logout
-    })();
-  }, []);
+    // Auto log out when access token expired? how to test.
+  });
 
   const protectedProps = {
     isAuthenticated: user.signedIn,
