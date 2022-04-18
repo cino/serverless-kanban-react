@@ -2,4 +2,4 @@ build:
 	cd app && npm run build
 
 deploy: build
-	cdk deploy
+	npx cdk deploy --require-approval never
