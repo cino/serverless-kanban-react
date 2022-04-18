@@ -16,11 +16,11 @@ export class ServerlessKanbanReactStack extends Stack {
   constructor(scope: Construct, id: string, props: ReactStackProps) {
     super(scope, id, props);
 
-    const zone = route53.HostedZone.fromLookup(this, "Zone", {
+    const zone = route53.HostedZone.fromLookup(this, 'Zone', {
       domainName: props.domainName,
     });
 
-    const bucket = new s3.Bucket(this, "KanbanAppBucket", {
+    const bucket = new s3.Bucket(this, 'KanbanAppBucket', {
       bucketName: `${props.subdomainName}.${props.domainName}`,
       websiteIndexDocument: 'index.html',
       publicReadAccess: false,

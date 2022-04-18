@@ -27,5 +27,6 @@
   "exclude": [
     "node_modules",
     "cdk.out",
+    "app", // Ignore app directory for now, add specific typescript for react later in app folder
   ],
 }

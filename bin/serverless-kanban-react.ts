@@ -8,7 +8,7 @@ const app = new cdk.App();
 new ServerlessKanbanReactStack(app, 'ServerlessKanbanReactStack', {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
-    region: process.env.CDK_DEFAULT_REGION
+    region: process.env.CDK_DEFAULT_REGION,
   },
 
   domainName: 'cino.io',
