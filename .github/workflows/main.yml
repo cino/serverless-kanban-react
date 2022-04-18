@@ -30,8 +30,10 @@ jobs:
         with:
           node-version: 14
 
-      - name: Install
-        run: npm ci
+      - name: Install both projects
+        run: |
+          npm ci
+          cd app && npm ci
 
       - name: Build, lint & test
         run: |
