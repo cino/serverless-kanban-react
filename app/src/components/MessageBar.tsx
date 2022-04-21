@@ -11,7 +11,7 @@ export default function MessageBar(props: any) {
                     <CheckCircleIcon className={"h-5 w-5 text-" + color + "-400"} aria-hidden="true" />
                 </div>
                 <div className="ml-3">
-                    <p className={"text-sm font-medium text-" + color + "-800"}>{ props.message }</p>
+                    <p className={"text-sm font-medium text-" + color + "-800"}>{props.message}</p>
                 </div>
                 <div className="ml-auto pl-3">
                     <div className="-mx-1.5 -my-1.5">
