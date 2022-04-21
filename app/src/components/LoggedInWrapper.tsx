@@ -66,7 +66,7 @@ export const LoggedInWrapper = (props: any) => {
                                         <div className="flex-shrink-0">
                                             <img
                                                 className="block h-8 w-auto"
-                                                src="https://tailwindui.com/img/logos/workflow-mark-teal-400.svg"
+                                                src="/baby-yoda.png"
                                                 alt="Workflow"
                                             />
                                         </div>
