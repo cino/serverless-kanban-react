@@ -11,13 +11,12 @@ export const SettingsScreenWrapper = (props: any) => {
         { name: 'Account', href: routes.user.account, icon: CogIcon, current: false },
         { name: 'Password', href: routes.user.password, icon: KeyIcon, current: false },
         { name: 'Notifications', href: routes.user.notifications, icon: BellIcon, current: false },
-        // { name: 'Billing', href: '#', icon: CreditCardIcon, current: false },
     ];
 
     return (
         <div>
             <main className="relative -mt-32">
-                <div className="max-w-screen-xl mx-auto pb-6 px-4 sm:px-6 lg:pb-16 lg:px-8">
+                <div className="max-w-screen-2xl mx-auto pb-6 px-4 sm:px-6 lg:pb-16 lg:px-8">
                     <div className="bg-white rounded-lg shadow overflow-hidden">
                         <div className="divide-y divide-gray-200 lg:grid lg:grid-cols-12 lg:divide-y-0 lg:divide-x">
                             <aside className="py-6 lg:col-span-3">
