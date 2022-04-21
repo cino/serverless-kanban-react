@@ -35,7 +35,7 @@ export class ServerlessKanbanReactStack extends Stack {
     const certificate = new acm.DnsValidatedCertificate(this, 'KanbanAppCertificate', {
       domainName: `${props.subdomainName}.${props.domainName}`,
       hostedZone: zone,
-      region: 'us-east-1',
+      region: 'us-east-1', // Needs to be in use-east-1 to use CloudFront
     });
     const viewerCertificate = cloudfront.ViewerCertificate.fromAcmCertificate(certificate, {
       aliases: [`${props.subdomainName}.${props.domainName}`],
@@ -55,6 +55,12 @@ export class ServerlessKanbanReactStack extends Stack {
           }],
         },
       ],
+      errorConfigurations: [{
+        errorCode: 404,
+        responseCode: 200,
+        responsePagePath: '/index.html',
+      }],
+      defaultRootObject: 'index.html',
       viewerCertificate: viewerCertificate,
     });
 

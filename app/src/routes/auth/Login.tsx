@@ -1,40 +1,59 @@
 import { LockClosedIcon } from '@heroicons/react/solid'
 import { ChangeEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { routes } from '../../App';
 import { signInWithEmail } from '../../app/auth';
-import { setCredentialsAsync } from '../../app/authSlice';
 import { useAppDispatch } from '../../app/hooks';
+import MessageBar from '../../components/MessageBar';
+
+interface LoginState {
+  message?: {
+    type: string;
+    text: string;
+  },
+};
 
 export const Login = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const location = useLocation();
+
+  const state = location.state as LoginState;
+
+  let initialMessageState = {type: '', message: ''};
+  if (state?.message) {
+    initialMessageState = { type: 'success', message: state.message.text };
+  }
+  const [message, setMessage] = useState(initialMessageState);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Todo; this should be a lot better
-    try {
-      await signInWithEmail(username, password);
+    // TODO; Handle redirect for TFA
+    await signInWithEmail(username, password)
+      .then((response) => dispatch({
+        type: 'auth/signedIn',
+        payload: 'test'
+      }))
+      .then(() => navigate(routes.index))
+      .catch((error) => {
 
-      (async () => {
-        await dispatch(setCredentialsAsync());
-      })().then(() => {
-        navigate('/dashboard');
+        if (error.code === 'UserNotConfirmedException') {
+          navigate(routes.auth.verify);
+        } else if (error.code === 'NewPasswordRequired') {
+          navigate(routes.auth.newPassword, {
+            state: {
+              user: error.user,
+              requiredAttributes: error.requiredAttributes,
+            },
+          });
+
+        } else {
+          setMessage({ type: 'error', message: error.message });
+        }
       });
-
-    } catch (err: any) {
-      console.log(err);
-      if (err.code === 'UserNotConfirmedException') {
-        navigate('/verify');
-      } else if (err.code === 'NewPasswordRequired') {
-        navigate('/new-password', { state: { username: username } });
-      } else {
-        // todo fix this.
-        // setError(err.message)
-      }
-    }
   }
 
   return (
@@ -44,8 +63,13 @@ export const Login = () => {
           <div>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
             <p className="mt-2 text-center text-sm text-gray-600">
+              Or
+              <a href={routes.auth.register} className="font-medium text-teal-600 hover:text-teal-500"> sign up here! </a>
             </p>
           </div>
+
+          {message.type && <MessageBar type={message.type} message={message.message} />}
+
           <form className="mt-8 space-y-6" onSubmit={handleSubmit} method="POST">
             <input type="hidden" name="remember" defaultValue="true" />
             <div className="rounded-md shadow-sm -space-y-px">
@@ -56,11 +80,11 @@ export const Login = () => {
                 <input
                   id="email-address"
                   name="email"
-                  type="email"
+                  type="text"
                   autoComplete="email"
                   required
                   className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
-                  placeholder="Email address"
+                  placeholder="Email address / username"
                   onChange={(event => setUsername(event.target.value))}
                 />
               </div>
@@ -83,7 +107,7 @@ export const Login = () => {
 
             <div className="flex items-center justify-between">
               <div className="text-sm">
-                <a href="https://google.com" className="font-medium text-teal-600 hover:text-teal-500">
+                <a href={routes.auth.forgotPassword} className="font-medium text-teal-600 hover:text-teal-500">
                   Forgot your password?
                 </a>
               </div>

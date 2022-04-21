@@ -1,5 +1,4 @@
-export const Register = () => {
-
+export const Register = (): JSX.Element => {
     return (
         <>
             Register

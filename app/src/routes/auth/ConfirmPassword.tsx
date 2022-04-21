@@ -1,34 +1,31 @@
 import { LockClosedIcon } from '@heroicons/react/solid'
 import { ChangeEvent, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { routes } from '../../App';
-import { completeNewPasswordChallenge } from '../../app/auth';
+import { confirmPassword } from '../../app/auth';
 import MessageBar from '../../components/MessageBar';
 
-interface NewPasswordState {
+interface ConfirmPasswordState {
+    email?: string,
     message?: {
         type: string;
         text: string;
     },
-    user?: {
-        email: string
-    },
-    requiredAttributes?: string[],
 };
 
-export const NewPassword = () => {
+export const ConfirmPassword = () => {
     const navigate = useNavigate();
     const location = useLocation();
-
-    const state = location.state as NewPasswordState;
+    const state = location.state as ConfirmPasswordState;
 
     let initialMessageState = { type: '', message: '' };
     if (state?.message) {
-        initialMessageState = { type: state.message.type, message: state.message.text };
+        initialMessageState = { type: 'success', message: state.message.text };
     }
 
     const [message, setMessage] = useState(initialMessageState);
+    const [email, setEmail] = useState('');
+    const [verificationCode, setVerificationCode] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
 
@@ -45,19 +42,21 @@ export const NewPassword = () => {
     const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        // Actually check if password and passwordRepeat match
+        const tempEmail = state?.email || email;
+
         await validatePassword()
-            .then(() => completeNewPasswordChallenge(password, state.requiredAttributes))
-            .then(() => navigate(routes.index, {
+            .then(() => confirmPassword(tempEmail, verificationCode, password))
+            .then(() => navigate(routes.auth.login, {
                 state: {
                     message: {
                         type: 'success',
-                        text: 'Password successfully changed, you can now login with your new password.'
-                    }
-                }
+                        text: 'Your password has been changed. You can now sign in with your new password.',
+                    },
+                },
             }))
-            .catch((error) => setMessage({ type: 'error', message: error }));
-
+            .catch((error) => {
+                setMessage({ type: 'error', message: error.message });
+            });
     }
 
     return (
@@ -65,7 +64,10 @@ export const NewPassword = () => {
             <div className="min-h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-md w-full space-y-8">
                     <div>
-                        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Before you can login a new password is required</h2>
+                        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">Confirm your new password</h2>
+                        <p className="mt-2 text-center text-sm text-gray-600">
+                            Blabla an email has been sent to $email with verification code blabla
+                        </p>
                     </div>
 
                     {message.type && <MessageBar type={message.type} message={message.message} />}
@@ -83,10 +85,25 @@ export const NewPassword = () => {
                                     type="email"
                                     autoComplete="email"
                                     required
-                                    disabled
                                     className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
+                                    value={state?.email}
                                     placeholder="Email address"
-                                    value={state?.user?.email}
+                                    onChange={(event => setEmail(event.target.value))}
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="verification-code" className="sr-only">
+                                    Verification code
+                                </label>
+                                <input
+                                    id="verification-code"
+                                    name="verificationCode"
+                                    type="text"
+                                    autoComplete="verification"
+                                    required
+                                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
+                                    placeholder="0123456"
+                                    onChange={(event => setVerificationCode(event.target.value))}
                                 />
                             </div>
                             <div>
@@ -106,7 +123,7 @@ export const NewPassword = () => {
                             </div>
                             <div>
                                 <label htmlFor="password_confirm" className="sr-only">
-                                    Password
+                                    Password confirmation
                                 </label>
                                 <input
                                     id="password_confirm"
@@ -121,6 +138,14 @@ export const NewPassword = () => {
                             </div>
                         </div>
 
+                        <div className="flex items-center justify-between">
+                            <div className="text-sm">
+                                <a href={routes.auth.login} className="font-medium text-teal-600 hover:text-teal-500">
+                                    Login
+                                </a>
+                            </div>
+                        </div>
+
                         <div>
                             <button
                                 type="submit"
@@ -129,7 +154,7 @@ export const NewPassword = () => {
                                 <span className="absolute left-0 inset-y-0 flex items-center pl-3">
                                     <LockClosedIcon className="h-5 w-5 text-teal-500 group-hover:text-teal-400" aria-hidden="true" />
                                 </span>
-                                Update password
+                                Set password
                             </button>
                         </div>
                     </form>

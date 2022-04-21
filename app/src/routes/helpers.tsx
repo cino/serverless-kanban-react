@@ -1,29 +1,37 @@
 import { Navigate } from "react-router-dom";
+import { useAppSelector } from "../app/hooks";
 
 export type ProtectedRouteProps = {
-    isAuthenticated: boolean;
-    authenticationPath: string;
     outlet: JSX.Element;
-};
+}
 
-export function ProtectedRoute({ isAuthenticated, authenticationPath, outlet }: ProtectedRouteProps) {
+export function ProtectedRoute({ outlet }: ProtectedRouteProps) {
+    const user = useAppSelector(state => state.auth);
+    const isAuthenticated = user.email !== null && user.email !== undefined;
+
     if (isAuthenticated) {
         return outlet;
-    } else {
-        return <Navigate to={ { pathname: authenticationPath } } replace />;
     }
-};
+
+    return <Navigate to={{ pathname: '/auth/login' }} replace />;
+}
 
 export type PublicRouteProps = {
-    isAuthenticated: boolean;
     outlet: JSX.Element;
-};
+}
 
 // Uno reverse ProtectedRoute to always redirect back to the dasboard.
-export function PublicRoute({ isAuthenticated, outlet }: PublicRouteProps) {
+export function PublicRoute({ outlet }: PublicRouteProps) {
+    const user = useAppSelector(state => state.auth);
+    const isAuthenticated = user.email !== null && user.email !== undefined;
+
     if (isAuthenticated) {
-        return <Navigate to={ { pathname: '/' } } replace />;
-    } else {
-        return outlet;
+        return <Navigate to={{ pathname: '/' }} replace />;
     }
-};
+
+    return outlet;
+}
+
+export function classNames(...classes: string[]) {
+    return classes.filter(Boolean).join(' ')
+}
