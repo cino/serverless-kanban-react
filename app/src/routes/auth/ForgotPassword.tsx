@@ -1,10 +1,10 @@
 import { LockClosedIcon } from '@heroicons/react/solid'
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, ReactElement, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '../../App';
 import { forgotPassword } from '../../app/auth';
 
-export const ForgotPassword = () => {
+export const ForgotPassword = (): ReactElement => {
     const navigate = useNavigate();
     const [email, setEmail] = useState('');
 
@@ -14,10 +14,6 @@ export const ForgotPassword = () => {
         await forgotPassword(email)
             .then((response) => console.log(response))
             .then(() => navigate(routes.auth.confirmPassword, { state: { email: email } }));
-
-        console.log(email);
-
-        // handle
     }
 
     return (

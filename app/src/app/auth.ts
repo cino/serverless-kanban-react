@@ -1,4 +1,4 @@
-import { AuthenticationDetails, CognitoUser, CognitoUserPool } from 'amazon-cognito-identity-js'
+import { AuthenticationDetails, CognitoUser, CognitoUserPool, CognitoUserSession, ICognitoUserAttributeData } from 'amazon-cognito-identity-js'
 
 const userPoolId = process.env.REACT_APP_USERPOOL_ID
 const clientId = process.env.REACT_APP_CLIENT_ID
@@ -30,9 +30,9 @@ export async function getSession() {
   return new Promise(function (resolve, reject) {
     currentUser?.getSession(function (err: any, session: any) {
       if (err) {
-        reject(err)
+        reject(err);
       } else {
-        resolve(session)
+        resolve(session);
       }
     });
   }).catch((err) => {
@@ -52,45 +52,6 @@ export async function getAttributes(): Promise<any> {
     throw err
   })
 }
-
-// export async function getAuthState(): Promise<AuthState> {
-//     try {
-//         const session: any = await getSession();
-//         const attr: any = await getAttributes();
-
-//         console.log('wat');
-
-//         return {
-//             isAuthenticated: true,
-//             sessionInfo: {
-//                 accessToken: session.getAccessToken().getJwtToken(),
-//                 refreshToken: session.getRefreshToken().getToken(),
-//                 username: attr[2].getValue(),
-//                 email: attr[1].getValue(),
-//                 sub: attr[0].getValue(),
-//             }
-//         }
-//         // setSessionInfo({
-//         //     accessToken: session.accessToken.jwtToken,
-//         //     refreshToken: session.refreshToken.token,
-//         // })
-//         // setAttrInfo(attr)
-//         // setAuthStatus(AuthStatus.SignedIn)
-//     } catch (err) {
-//         console.log('correct');
-//         // setAuthStatus(AuthStatus.SignedOut)
-//         return {
-//             isAuthenticated: false,
-//             sessionInfo: {
-//                 accessToken: undefined,
-//                 refreshToken: undefined,
-//                 username: undefined,
-//                 email: undefined,
-//                 sub: undefined,
-//             }
-//         }
-//     }
-// }
 
 export function signInWithEmail(username: string, password: string): Promise<any> {
   return new Promise(function (resolve, reject) {
@@ -171,5 +132,46 @@ export async function confirmPassword(email: string, verificationCode: string, p
         reject(err);
       },
     })
+  });
+}
+
+export async function changePassword(oldPassword: string, newPassword: string) {
+  return new Promise(async function (resolve, reject) {
+    const user = userPool.getCurrentUser();
+
+    user?.getSession(function (err: any, session: CognitoUserSession) {
+      if (err) {
+        reject(err);
+      } else {
+        user.changePassword(oldPassword, newPassword, function (err: any) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve('success');
+          }
+        });
+      }
+    });
+  });
+}
+
+
+export async function updateAttributes(attributes: ICognitoUserAttributeData[]) {
+  return new Promise(async function (resolve, reject) {
+    const user = userPool.getCurrentUser();
+
+    user?.getSession(function (err: any, session: CognitoUserSession) {
+      if (err) {
+        reject(err);
+      } else {
+        user.updateAttributes(attributes, function (err: any) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve('success');
+          }
+        });
+      }
+    });
   });
 }

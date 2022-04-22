@@ -1,10 +1,11 @@
-import { LockClosedIcon } from '@heroicons/react/solid'
-import { ChangeEvent, useState } from 'react';
+import { LockClosedIcon } from '@heroicons/react/solid';
+import { ChangeEvent, ReactElement, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { routes } from '../../App';
 import { completeNewPasswordChallenge } from '../../app/auth';
 import MessageBar from '../../components/MessageBar';
+import { validatePassword } from '../helpers';
 
 interface NewPasswordState {
     message?: {
@@ -17,7 +18,7 @@ interface NewPasswordState {
     requiredAttributes?: string[],
 };
 
-export const NewPassword = () => {
+export const NewPassword = (): ReactElement => {
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -32,21 +33,11 @@ export const NewPassword = () => {
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
 
-    function validatePassword(): Promise<void> {
-        return new Promise(function (resolve, reject) {
-            if (password !== passwordConfirm) {
-                reject('Passwords do not match');
-            } else {
-                resolve();
-            }
-        });
-    };
-
     const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         // Actually check if password and passwordRepeat match
-        await validatePassword()
+        await validatePassword(password, passwordConfirm)
             .then(() => completeNewPasswordChallenge(password, state.requiredAttributes))
             .then(() => navigate(routes.index, {
                 state: {
@@ -97,7 +88,6 @@ export const NewPassword = () => {
                                     id="password"
                                     name="password"
                                     type="password"
-                                    autoComplete="current-password"
                                     required
                                     className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
                                     placeholder="Password"
@@ -112,7 +102,6 @@ export const NewPassword = () => {
                                     id="password_confirm"
                                     name="password_confirm"
                                     type="password"
-                                    autoComplete="current-password"
                                     required
                                     className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-teal-500 focus:border-teal-500 focus:z-10 sm:text-sm"
                                     placeholder="Confirm password"

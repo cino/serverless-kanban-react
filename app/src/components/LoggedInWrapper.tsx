@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, ReactElement } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { SearchIcon } from '@heroicons/react/solid';
 import {
@@ -19,16 +19,20 @@ const user = {
     imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
 }
 
-export const LoggedInWrapper = (props: any) => {
+interface LoggedInWrapperProps {
+    children: ReactElement;
+    title?: string;
+}
+
+export const LoggedInWrapper = (props: LoggedInWrapperProps): ReactElement => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
 
     const navigation = [
-        { name: 'Dashboard', href: '/', current: true },
-        { name: 'Team', href: '/team', current: false },
-        { name: 'Projects', href: '/projects', current: false },
-        { name: 'Calendar', href: '/calendar', current: false },
-        { name: 'Reports', href: '/reports', current: false },
+        { name: 'Dashboard', href: routes.index, current: true },
+        { name: 'Boards', href: routes.boards, current: false },
+        { name: 'My issues', href: routes.myIssues, current: false },
+        { name: 'Calendar', href: routes.calendar, current: false },
     ];
 
     const userNavigation = [

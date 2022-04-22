@@ -3,10 +3,15 @@ import {
     CogIcon,
     KeyIcon,
 } from '@heroicons/react/outline';
+import { ReactElement } from 'react';
 import { routes } from '../../App';
 import { classNames } from '../helpers';
 
-export const SettingsScreenWrapper = (props: any) => {
+interface SettingsScreenWrapperProps {
+    children: ReactElement;
+}
+
+export const SettingsScreenWrapper = (props: SettingsScreenWrapperProps): ReactElement => {
     const subNavigation = [
         { name: 'Account', href: routes.user.account, icon: CogIcon, current: false },
         { name: 'Password', href: routes.user.password, icon: KeyIcon, current: false },

@@ -1,5 +1,6 @@
-import { LoggedInWrapper } from "../../components/LoggedInWrapper"
-import { SettingsScreenWrapper } from "./SettingsScreenWrapper"
+import { LoggedInWrapper } from "../../components/LoggedInWrapper";
+import { SettingsScreenWrapper } from "./SettingsScreenWrapper";
+import { ReactElement } from "react";
 
 const user = {
     handle: 'tommycooks',
@@ -8,7 +9,7 @@ const user = {
     imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
 }
 
-export const Account = () => {
+export const Account = (): ReactElement => {
     return (
         <>
             <LoggedInWrapper title="Account settings">
@@ -17,9 +18,6 @@ export const Account = () => {
                         <div className="py-6 px-4 sm:p-6 lg:pb-8">
                             <div>
                                 <h2 className="text-lg leading-6 font-medium text-gray-900">Profile</h2>
-                                <p className="mt-1 text-sm text-gray-500">
-                                    This information will be displayed publicly so be careful what you share.
-                                </p>
                             </div>
 
                             <div className="mt-6 flex flex-col lg:flex-row">

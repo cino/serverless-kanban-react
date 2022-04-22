@@ -1,6 +1,7 @@
-import { LoggedInWrapper } from "../components/LoggedInWrapper"
+import { ReactElement } from 'react';
+import { LoggedInWrapper } from '../components/LoggedInWrapper';
 
-export const Calendar = () => {
+export const Calendar = (): ReactElement => {
     return (
         <>
             <LoggedInWrapper>

@@ -1,5 +1,5 @@
-import { LockClosedIcon } from '@heroicons/react/solid'
-import { ChangeEvent, useState } from 'react';
+import { LockClosedIcon } from '@heroicons/react/solid';
+import { ChangeEvent, ReactElement, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { routes } from '../../App';
 import { signInWithEmail } from '../../app/auth';
@@ -13,7 +13,7 @@ interface LoginState {
   },
 };
 
-export const Login = () => {
+export const Login = (): ReactElement => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const location = useLocation();

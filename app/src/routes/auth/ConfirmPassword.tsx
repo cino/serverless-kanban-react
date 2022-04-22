@@ -1,9 +1,10 @@
 import { LockClosedIcon } from '@heroicons/react/solid'
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, ReactElement, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { routes } from '../../App';
 import { confirmPassword } from '../../app/auth';
 import MessageBar from '../../components/MessageBar';
+import { validatePassword } from '../helpers';
 
 interface ConfirmPasswordState {
     email?: string,
@@ -13,7 +14,7 @@ interface ConfirmPasswordState {
     },
 };
 
-export const ConfirmPassword = () => {
+export const ConfirmPassword = (): ReactElement => {
     const navigate = useNavigate();
     const location = useLocation();
     const state = location.state as ConfirmPasswordState;
@@ -29,31 +30,14 @@ export const ConfirmPassword = () => {
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
 
-    function validatePassword(): Promise<void> {
-        return new Promise(function (resolve, reject) {
-            if (password !== passwordConfirm) {
-                reject('Passwords do not match');
-            } else {
-                resolve();
-            }
-        });
-    };
-
     const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         const tempEmail = state?.email || email;
 
-        await validatePassword()
+        await validatePassword(password, passwordConfirm)
             .then(() => confirmPassword(tempEmail, verificationCode, password))
-            .then(() => navigate(routes.auth.login, {
-                state: {
-                    message: {
-                        type: 'success',
-                        text: 'Your password has been changed. You can now sign in with your new password.',
-                    },
-                },
-            }))
+            .then(() => navigate(routes.index))
             .catch((error) => {
                 setMessage({ type: 'error', message: error.message });
             });

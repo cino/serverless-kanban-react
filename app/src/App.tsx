@@ -1,4 +1,5 @@
-import { Dashboard, Projects, Calendar, Reports, Team, Login, Register } from './routes';
+import { ReactElement } from 'react';
+import { Boards, Dashboard, Projects, Calendar, Team, Login, Register, MyIssues } from './routes';
 import { ProtectedRoute, PublicRoute } from './routes/helpers';
 import { ForgotPassword } from './routes/auth/ForgotPassword';
 import { Verify } from './routes/auth/Verify';
@@ -14,8 +15,9 @@ export const routes = {
   index: '/',
   team: '/team',
   projects: '/projects',
+  boards: '/boards',
   calendar: '/calendar',
-  reports: '/reports',
+  myIssues: '/my-issues',
 
   auth: {
     login: '/auth/login',
@@ -33,7 +35,7 @@ export const routes = {
   },
 }
 
-export const App = () => {
+export const App = (): ReactElement => {
   return (
     <div className="App">
       <BrowserRouter>
@@ -44,9 +46,10 @@ export const App = () => {
           <Route path={routes.user.password} element={<ProtectedRoute outlet={<Password />} />} />
 
           <Route path={routes.team} element={<ProtectedRoute outlet={<Team />} />} />
+          <Route path={routes.boards} element={<ProtectedRoute outlet={<Boards />} />} />
           <Route path={routes.projects} element={<ProtectedRoute outlet={<Projects />} />} />
           <Route path={routes.calendar} element={<ProtectedRoute outlet={<Calendar />} />} />
-          <Route path={routes.reports} element={<ProtectedRoute outlet={<Reports />} />} />
+          <Route path={routes.myIssues} element={<ProtectedRoute outlet={<MyIssues />} />} />
 
           <Route path={routes.auth.login} element={<PublicRoute outlet={<Login />} />} />
           <Route path={routes.auth.register} element={<PublicRoute outlet={<Register />} />} />

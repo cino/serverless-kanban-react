@@ -1,22 +1,40 @@
-import { useState } from 'react';
+import { ChangeEvent, useState, ReactElement } from 'react';
 import { Switch } from '@headlessui/react';
-import { LoggedInWrapper } from "../../components/LoggedInWrapper"
-import { SettingsScreenWrapper } from "./SettingsScreenWrapper"
+import { LoggedInWrapper } from '../../components/LoggedInWrapper';
+import { SettingsScreenWrapper } from './SettingsScreenWrapper';
 import { classNames } from '../helpers';
+import { ICognitoUserAttributeData } from 'amazon-cognito-identity-js';
+import { updateAttributes } from '../../app/auth';
 
-export const Notifications = () => {
-    const [availableToHire, setAvailableToHire] = useState(true)
-    const [privateAccount, setPrivateAccount] = useState(false)
-    const [allowCommenting, setAllowCommenting] = useState(true)
-    const [allowMentions, setAllowMentions] = useState(true)
+export const Notifications = (): ReactElement => {
+    // TODO: Set Initial state based on CurrentUser
+    const [issueUpdated, setIssueUpdated] = useState(true)
+    const [mentioned, setMentioned] = useState(false)
+
+    const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const attributes: ICognitoUserAttributeData[] = [
+            {
+                Name: 'custom:notifyItemUpdated',
+                Value: issueUpdated.toString(),
+            },
+            {
+                Name: 'custom:notifyMentioned',
+                Value: mentioned.toString(),
+            }
+        ];
+
+        await updateAttributes(attributes)
+            .catch((error) => console.log(error));
+    }
 
     return (
         <>
             <LoggedInWrapper title="Account settings">
                 <SettingsScreenWrapper>
 
-                    <form className="divide-y divide-gray-200 lg:col-span-9" action="#" method="POST">
-                        {/* Privacy section */}
+                    <form className="divide-y divide-gray-200 lg:col-span-9" onSubmit={handleSubmit} method="POST">
                         <div className="pt-6 divide-y divide-gray-200">
                             <div className="px-4 sm:px-6">
                                 <div>
@@ -30,102 +48,51 @@ export const Notifications = () => {
                                     <Switch.Group as="li" className="py-4 flex items-center justify-between">
                                         <div className="flex flex-col">
                                             <Switch.Label as="p" className="text-sm font-medium text-gray-900" passive>
-                                                Available to hire
+                                                Issue updated
                                             </Switch.Label>
                                             <Switch.Description className="text-sm text-gray-500">
-                                                Nulla amet tempus sit accumsan. Aliquet turpis sed sit lacinia.
+                                                Whenever an issue gets updated which you created or assigned to you.
                                             </Switch.Description>
                                         </div>
                                         <Switch
-                                            checked={availableToHire}
-                                            onChange={setAvailableToHire}
+                                            checked={issueUpdated}
+                                            onChange={setIssueUpdated}
                                             className={classNames(
-                                                availableToHire ? 'bg-teal-500' : 'bg-gray-200',
+                                                issueUpdated ? 'bg-teal-500' : 'bg-gray-200',
                                                 'ml-4 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500'
                                             )}
                                         >
                                             <span
                                                 aria-hidden="true"
                                                 className={classNames(
-                                                    availableToHire ? 'translate-x-5' : 'translate-x-0',
+                                                    issueUpdated ? 'translate-x-5' : 'translate-x-0',
                                                     'inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200'
                                                 )}
                                             />
                                         </Switch>
                                     </Switch.Group>
+
                                     <Switch.Group as="li" className="py-4 flex items-center justify-between">
                                         <div className="flex flex-col">
                                             <Switch.Label as="p" className="text-sm font-medium text-gray-900" passive>
-                                                Make account private
+                                                Mentioned
                                             </Switch.Label>
                                             <Switch.Description className="text-sm text-gray-500">
-                                                Pharetra morbi dui mi mattis tellus sollicitudin cursus pharetra.
+                                                When someone mentions you in a comment
                                             </Switch.Description>
                                         </div>
                                         <Switch
-                                            checked={privateAccount}
-                                            onChange={setPrivateAccount}
+                                            checked={mentioned}
+                                            onChange={setMentioned}
                                             className={classNames(
-                                                privateAccount ? 'bg-teal-500' : 'bg-gray-200',
+                                                mentioned ? 'bg-teal-500' : 'bg-gray-200',
                                                 'ml-4 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500'
                                             )}
                                         >
                                             <span
                                                 aria-hidden="true"
                                                 className={classNames(
-                                                    privateAccount ? 'translate-x-5' : 'translate-x-0',
-                                                    'inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200'
-                                                )}
-                                            />
-                                        </Switch>
-                                    </Switch.Group>
-                                    <Switch.Group as="li" className="py-4 flex items-center justify-between">
-                                        <div className="flex flex-col">
-                                            <Switch.Label as="p" className="text-sm font-medium text-gray-900" passive>
-                                                Allow commenting
-                                            </Switch.Label>
-                                            <Switch.Description className="text-sm text-gray-500">
-                                                Integer amet, nunc hendrerit adipiscing nam. Elementum ame
-                                            </Switch.Description>
-                                        </div>
-                                        <Switch
-                                            checked={allowCommenting}
-                                            onChange={setAllowCommenting}
-                                            className={classNames(
-                                                allowCommenting ? 'bg-teal-500' : 'bg-gray-200',
-                                                'ml-4 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500'
-                                            )}
-                                        >
-                                            <span
-                                                aria-hidden="true"
-                                                className={classNames(
-                                                    allowCommenting ? 'translate-x-5' : 'translate-x-0',
-                                                    'inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200'
-                                                )}
-                                            />
-                                        </Switch>
-                                    </Switch.Group>
-                                    <Switch.Group as="li" className="py-4 flex items-center justify-between">
-                                        <div className="flex flex-col">
-                                            <Switch.Label as="p" className="text-sm font-medium text-gray-900" passive>
-                                                Allow mentions
-                                            </Switch.Label>
-                                            <Switch.Description className="text-sm text-gray-500">
-                                                Adipiscing est venenatis enim molestie commodo eu gravid
-                                            </Switch.Description>
-                                        </div>
-                                        <Switch
-                                            checked={allowMentions}
-                                            onChange={setAllowMentions}
-                                            className={classNames(
-                                                allowMentions ? 'bg-teal-500' : 'bg-gray-200',
-                                                'ml-4 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500'
-                                            )}
-                                        >
-                                            <span
-                                                aria-hidden="true"
-                                                className={classNames(
-                                                    allowMentions ? 'translate-x-5' : 'translate-x-0',
+                                                    mentioned ? 'translate-x-5' : 'translate-x-0',
                                                     'inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200'
                                                 )}
                                             />

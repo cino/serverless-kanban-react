@@ -1,11 +1,12 @@
-import { LoggedInWrapper } from "../components/LoggedInWrapper"
+import { ReactElement } from 'react';
+import { LoggedInWrapper } from '../components/LoggedInWrapper';
 
-export const Reports = () => {
+export const MyIssues = (): ReactElement => {
     return (
         <>
             <LoggedInWrapper>
                 <div className="px-4 py-4 sm:px-0">
-                    Reports view
+                    My issues
                 </div>
             </LoggedInWrapper>
         </>

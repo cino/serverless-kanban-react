@@ -12,6 +12,10 @@
     "project": "./tsconfig.json"
   },
   "rules": {
+    "quotes": [
+      "warn",
+      "double"
+    ],
     "linebreak-style": [
       "warn",
       "unix"
