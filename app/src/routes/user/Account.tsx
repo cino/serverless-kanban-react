@@ -1,6 +1,8 @@
 import { LoggedInWrapper } from "../../components/LoggedInWrapper";
 import { SettingsScreenWrapper } from "./SettingsScreenWrapper";
-import { ReactElement } from "react";
+import { ChangeEvent, ReactElement, useState } from "react";
+import { updateAttributes } from "../../app/auth";
+import { ICognitoUserAttributeData } from "amazon-cognito-identity-js";
 
 const user = {
     handle: 'tommycooks',
@@ -10,11 +12,38 @@ const user = {
 }
 
 export const Account = (): ReactElement => {
+    // get cognitoUser;
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+
+    const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const attributes: ICognitoUserAttributeData[] = [
+            {
+                Name: 'given_name',
+                Value: firstName,
+            },
+            {
+                Name: 'family_name',
+                Value: lastName,
+            },
+            {
+                Name: 'email',
+                Value: email,
+            }
+        ];
+
+        await updateAttributes(attributes)
+            .catch((error) => console.log(error));
+    }
+
     return (
         <>
             <LoggedInWrapper title="Account settings">
                 <SettingsScreenWrapper>
-                    <form className="divide-y divide-gray-200 lg:col-span-9" action="#" method="POST">
+                    <form className="divide-y divide-gray-200 lg:col-span-9" onSubmit={handleSubmit} method="POST">
                         <div className="py-6 px-4 sm:p-6 lg:pb-8">
                             <div>
                                 <h2 className="text-lg leading-6 font-medium text-gray-900">Profile</h2>
@@ -22,41 +51,46 @@ export const Account = (): ReactElement => {
 
                             <div className="mt-6 flex flex-col lg:flex-row">
                                 <div className="flex-grow space-y-6">
-                                    <div>
-                                        <label htmlFor="username" className="block text-sm font-medium text-gray-700">
-                                            Username
+                                    <div className="col-span-12 sm:col-span-6">
+                                        <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
+                                            First name
                                         </label>
-                                        <div className="mt-1 rounded-md shadow-sm flex">
-                                            <span className="bg-gray-50 border border-r-0 border-gray-300 rounded-l-md px-3 inline-flex items-center text-gray-500 sm:text-sm">
-                                                workcation.com/
-                                            </span>
-                                            <input
-                                                type="text"
-                                                name="username"
-                                                id="username"
-                                                autoComplete="username"
-                                                className="focus:ring-sky-500 focus:border-sky-500 flex-grow block w-full min-w-0 rounded-none rounded-r-md sm:text-sm border-gray-300"
-                                                defaultValue={user.handle}
-                                            />
-                                        </div>
+                                        <input
+                                            type="text"
+                                            name="first-name"
+                                            id="first-name"
+                                            autoComplete="given-name"
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                                            onChange={(event => setFirstName(event.target.value))}
+                                        />
                                     </div>
 
-                                    <div>
-                                        <label htmlFor="about" className="block text-sm font-medium text-gray-700">
-                                            About
+                                    <div className="col-span-12 sm:col-span-6">
+                                        <label htmlFor="last-name" className="block text-sm font-medium text-gray-700">
+                                            Last name
                                         </label>
-                                        <div className="mt-1">
-                                            <textarea
-                                                id="about"
-                                                name="about"
-                                                rows={3}
-                                                className="shadow-sm focus:ring-sky-500 focus:border-sky-500 mt-1 block w-full sm:text-sm border border-gray-300 rounded-md"
-                                                defaultValue={''}
-                                            />
-                                        </div>
-                                        <p className="mt-2 text-sm text-gray-500">
-                                            Brief description for your profile. URLs are hyperlinked.
-                                        </p>
+                                        <input
+                                            type="text"
+                                            name="last-name"
+                                            id="last-name"
+                                            autoComplete="family-name"
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                                            onChange={(event => setLastName(event.target.value))}
+                                        />
+                                    </div>
+
+                                    <div className="col-span-12 sm:col-span-6">
+                                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                                            Email
+                                        </label>
+                                        <input
+                                            type="email"
+                                            name="email"
+                                            id="email"
+                                            autoComplete="email"
+                                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
+                                            onChange={(event => setEmail(event.target.value))}
+                                        />
                                     </div>
                                 </div>
 
@@ -108,59 +142,6 @@ export const Account = (): ReactElement => {
                                             />
                                         </label>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div className="mt-6 grid grid-cols-12 gap-6">
-                                <div className="col-span-12 sm:col-span-6">
-                                    <label htmlFor="first-name" className="block text-sm font-medium text-gray-700">
-                                        First name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="first-name"
-                                        id="first-name"
-                                        autoComplete="given-name"
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
-                                    />
-                                </div>
-
-                                <div className="col-span-12 sm:col-span-6">
-                                    <label htmlFor="last-name" className="block text-sm font-medium text-gray-700">
-                                        Last name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="last-name"
-                                        id="last-name"
-                                        autoComplete="family-name"
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
-                                    />
-                                </div>
-
-                                <div className="col-span-12">
-                                    <label htmlFor="url" className="block text-sm font-medium text-gray-700">
-                                        URL
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="url"
-                                        id="url"
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
-                                    />
-                                </div>
-
-                                <div className="col-span-12 sm:col-span-6">
-                                    <label htmlFor="company" className="block text-sm font-medium text-gray-700">
-                                        Company
-                                    </label>
-                                    <input
-                                        type="text"
-                                        name="company"
-                                        id="company"
-                                        autoComplete="organization"
-                                        className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-sky-500 focus:border-sky-500 sm:text-sm"
-                                    />
                                 </div>
                             </div>
 
