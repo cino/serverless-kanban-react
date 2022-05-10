@@ -41,16 +41,28 @@ export async function getSession() {
 }
 export async function getAttributes(): Promise<any> {
   return new Promise(function (resolve, reject) {
-    currentUser.getUserAttributes(function (err: any, attributes: any) {
+    const user = userPool.getCurrentUser();
+
+    user?.getSession(function (err: any, session: CognitoUserSession) {
       if (err) {
-        reject(err)
+        reject(err);
       } else {
-        resolve(attributes)
+        user.getUserAttributes(function (err: any, attributes: any) {
+          if (err) {
+            reject(err);
+          } else {
+            // Directly resolving the attributes turns in a `A non-serializable value was detected in an action, in the path` error
+            resolve(attributes.map((attribute: ICognitoUserAttributeData) => {
+              return {
+                Name: attribute.Name,
+                Value: attribute.Value,
+              }
+            }));
+          }
+        });
       }
-    })
-  }).catch((err) => {
-    throw err
-  })
+    });
+  });
 }
 
 export function signInWithEmail(username: string, password: string): Promise<any> {

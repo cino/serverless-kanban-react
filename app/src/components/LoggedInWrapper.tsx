@@ -1,4 +1,4 @@
-import { Fragment, ReactElement } from 'react';
+import { Fragment, ReactElement, useEffect } from 'react';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { SearchIcon } from '@heroicons/react/solid';
 import {
@@ -8,7 +8,7 @@ import {
 } from '@heroicons/react/outline';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../app/hooks';
-import { signOut } from '../app/auth';
+import { getAttributes, signOut } from '../app/auth';
 import { classNames } from '../routes/helpers';
 import { routes } from '../App';
 
@@ -27,6 +27,15 @@ interface LoggedInWrapperProps {
 export const LoggedInWrapper = (props: LoggedInWrapperProps): ReactElement => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        const setUser = async () => {
+            const attributes = await getAttributes();
+            dispatch({ type: 'auth/setUser', payload: attributes });
+        }
+
+        setUser().catch(console.error);
+    }, []);
 
     const navigation = [
         { name: 'Dashboard', href: routes.index, current: true },
