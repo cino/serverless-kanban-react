@@ -1,11 +1,11 @@
 import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import * as acm from 'aws-cdk-lib/aws-certificatemanager';
-import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
-import * as route53 from 'aws-cdk-lib/aws-route53';
-import * as s3 from 'aws-cdk-lib/aws-s3';
-import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
-import * as targets from 'aws-cdk-lib/aws-route53-targets';
+import { DnsValidatedCertificate } from 'aws-cdk-lib/aws-certificatemanager';
+import { CloudFrontWebDistribution, CloudFrontAllowedMethods, OriginAccessIdentity, ViewerCertificate } from 'aws-cdk-lib/aws-cloudfront';
+import { HostedZone, ARecord, RecordTarget } from 'aws-cdk-lib/aws-route53';
+import { Bucket, BlockPublicAccess } from 'aws-cdk-lib/aws-s3';
+import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
+import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
 
 interface ReactStackProps extends StackProps {
   readonly domainName: string;
@@ -16,32 +16,32 @@ export class ServerlessKanbanReactStack extends Stack {
   constructor(scope: Construct, id: string, props: ReactStackProps) {
     super(scope, id, props);
 
-    const zone = route53.HostedZone.fromLookup(this, 'Zone', {
+    const zone = HostedZone.fromLookup(this, 'Zone', {
       domainName: props.domainName,
     });
 
-    const bucket = new s3.Bucket(this, 'KanbanAppBucket', {
+    const bucket = new Bucket(this, 'KanbanAppBucket', {
       bucketName: `${props.subdomainName}.${props.domainName}`,
       websiteIndexDocument: 'index.html',
       publicReadAccess: false,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
     });
 
-    const cloudFrontOAI = new cloudfront.OriginAccessIdentity(this, 'KanbanAppOAI', {
+    const cloudFrontOAI = new OriginAccessIdentity(this, 'KanbanAppOAI', {
       comment: 'Kanban App Origin Access Identity',
     });
     bucket.grantRead(cloudFrontOAI);
 
-    const certificate = new acm.DnsValidatedCertificate(this, 'KanbanAppCertificate', {
+    const certificate = new DnsValidatedCertificate(this, 'KanbanAppCertificate', {
       domainName: `${props.subdomainName}.${props.domainName}`,
       hostedZone: zone,
       region: 'us-east-1', // Needs to be in use-east-1 to use CloudFront
     });
-    const viewerCertificate = cloudfront.ViewerCertificate.fromAcmCertificate(certificate, {
+    const viewerCertificate = ViewerCertificate.fromAcmCertificate(certificate, {
       aliases: [`${props.subdomainName}.${props.domainName}`],
     });
 
-    const distribution = new cloudfront.CloudFrontWebDistribution(this, 'KanbanAppDistribution', {
+    const distribution = new CloudFrontWebDistribution(this, 'KanbanAppDistribution', {
       originConfigs: [
         {
           s3OriginSource: {
@@ -51,7 +51,7 @@ export class ServerlessKanbanReactStack extends Stack {
           behaviors: [{
             isDefaultBehavior: true,
             compress: true,
-            allowedMethods: cloudfront.CloudFrontAllowedMethods.GET_HEAD_OPTIONS,
+            allowedMethods: CloudFrontAllowedMethods.GET_HEAD_OPTIONS,
           }],
         },
       ],
@@ -64,17 +64,17 @@ export class ServerlessKanbanReactStack extends Stack {
       viewerCertificate: viewerCertificate,
     });
 
-    new s3deploy.BucketDeployment(this, 'DeployWithInvalidation', {
-      sources: [s3deploy.Source.asset('./app/build')],
+    new BucketDeployment(this, 'DeployWithInvalidation', {
+      sources: [Source.asset('./app/build')],
       destinationBucket: bucket,
       distribution,
       distributionPaths: ['/*'],
     });
 
-    new route53.ARecord(this, 'AliasRecord', {
+    new ARecord(this, 'AliasRecord', {
       zone,
       recordName: `${props.subdomainName}.${props.domainName}`,
-      target: route53.RecordTarget.fromAlias(new targets.CloudFrontTarget(distribution)),
+      target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),
     });
 
     // We are using CfnOutput to output the CloudFront URL to the console and the CloudFormation interface

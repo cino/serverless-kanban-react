@@ -14,7 +14,7 @@
   "rules": {
     "quotes": [
       "warn",
-      "double"
+      "single"
     ],
     "linebreak-style": [
       "warn",
